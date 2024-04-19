@@ -1,10 +1,9 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
 <head>
     <script src="https://aframe.io/releases/1.0.4/aframe.min.js"></script>
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
-    <script src="https://raw.githack.com/AR-js-org/studio-backend/master/src/modules/marker/tools/gesture-detector.js"></script>
-    <script src="https://raw.githack.com/AR-js-org/studio-backend/master/src/modules/marker/tools/gesture-handler.js"></script>
+    <script src="https://rawcdn.githack.com/oscarmarinmiro/aframe-youtube-component/v4.2.0/dist/aframe-youtube-component.min.js"></script>
 </head>
 
 <body style="margin: 0; overflow: hidden;">
@@ -15,12 +14,8 @@
         id="scene"
         embedded
         gesture-detector
+        youtube
     >
-        <a-assets>
-            <!-- Placeholder video to be replaced dynamically -->
-            <video id="dynamicVideo" autoplay loop crossorigin webkit-playsinline playsinline></video>
-        </a-assets>
-
         <a-marker
             type="pattern"
             preset="custom"
@@ -41,27 +36,26 @@
                 rotation="-90 0 0"
                 class="clickable"
                 gesture-handler
+                youtube="src: https://www.youtube.com/watch?v=VIDEO_ID"
             ></a-video>
         </a-marker>
 
         <a-entity camera></a-entity>
     </a-scene>
 
-    <!-- JavaScript to handle video loading -->
     <script>
         AFRAME.registerComponent('videohandler', {
             init: function () {
                 var marker = this.el;
-                var vid = document.querySelector("#dynamicVideo");
 
                 marker.addEventListener('markerFound', function () {
-                    var youtubeUrl = 'https://youtu.be/O3CCnhqLDfQ';
-                    vid.src = youtubeUrl;
-                    vid.play();
+                    var vid = this.querySelector("a-video");
+                    vid.components.youtube.playVideo();
                 });
 
                 marker.addEventListener('markerLost', function () {
-                    vid.pause();
+                    var vid = this.querySelector("a-video");
+                    vid.components.youtube.pauseVideo();
                 });
             },
         });
