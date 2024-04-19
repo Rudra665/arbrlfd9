@@ -21,7 +21,7 @@
         <a-marker
             type="pattern"
             preset="custom"
-            url="./assets/pattern-default-marker.patt"
+            url="https://raw.githubusercontent.com/AR-js-org/AR.js/master/data/images/hiro.patt"
             videohandler
             smooth="true"
             smoothCount="10"
@@ -55,11 +55,23 @@
         }
 
         function onPlayerReady(event) {
-            // Video is ready to play
+            console.log('Video is ready to play');
+            // Automatically start playing the video when ready
+            player.playVideo();
         }
 
         function onPlayerStateChange(event) {
-            // Handle player state changes (e.g., play, pause, etc.)
+            if (event.data == YT.PlayerState.PLAYING) {
+                console.log('Video is playing');
+                // You can perform actions here when the video is playing
+            } else if (event.data == YT.PlayerState.PAUSED) {
+                console.log('Video is paused');
+                // You can perform actions here when the video is paused
+            } else if (event.data == YT.PlayerState.ENDED) {
+                console.log('Video has ended');
+                // You can perform actions here when the video has ended
+            }
+            // Handle other state changes as needed
         }
 
         AFRAME.registerComponent('videohandler', {
@@ -68,7 +80,8 @@
                 var container = document.getElementById('videoContainer');
 
                 marker.addEventListener('markerFound', function () {
-                    var videoSource = 'https://www.youtube.com/watch?v=O3CCnhqLDfQ';
+                    var videoSource = 'https://www.youtube.com/watch?v=O3CCnhqLDfQ'; // Replace with actual video URL or ID
+
                     var videoType = '';
 
                     if (videoSource.includes('youtube.com') || videoSource.includes('youtu.be')) {
@@ -86,6 +99,17 @@
                         videoType = 'external';
                         container.innerHTML = `<iframe src="${videoSource}" frameborder="0" allowfullscreen></iframe>`;
                     }
+
+                    function getYouTubeVideoId(url) {
+                        var videoId = '';
+                        if (url.includes('youtube.com') && url.includes('v=')) {
+                            var params = new URLSearchParams(new URL(url).search);
+                            videoId = params.get('v');
+                        } else if (url.includes('youtu.be/')) {
+                            videoId = url.split('youtu.be/')[1];
+                        }
+                        return videoId;
+                    }
                 });
 
                 marker.addEventListener('markerLost', function () {
@@ -94,17 +118,6 @@
                         player.stopVideo();
                     }
                 });
-
-                function getYouTubeVideoId(url) {
-                    var videoId = '';
-                    if (url.includes('youtube.com') && url.includes('v=')) {
-                        var params = new URLSearchParams(new URL(url).search);
-                        videoId = params.get('v');
-                    } else if (url.includes('youtu.be/')) {
-                        videoId = url.split('youtu.be/')[1];
-                    }
-                    return videoId;
-                }
             },
         });
     </script>
