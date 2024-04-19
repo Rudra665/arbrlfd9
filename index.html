@@ -55,7 +55,10 @@
                 var vid = document.querySelector("#dynamicVideo");
 
                 marker.addEventListener('markerFound', function () {
-                    vid.src = prompt("https://youtu.be/O3CCnhqLDfQ?t=5969");
+                    var videoId = prompt("Enter YouTube video ID:");
+                    var youtubeUrl = 'https://www.youtube.com/watch?v=' + videoId;
+                    var embedUrl = 'https://www.youtube.com/embed/' + videoId + '?autoplay=1';
+                    vid.src = embedUrl;
                     vid.play();
                 });
 
