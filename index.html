@@ -4,6 +4,7 @@
     <script src="https://aframe.io/releases/1.0.4/aframe.min.js"></script>
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
     <script src="https://rawcdn.githack.com/oscarmarinmiro/aframe-youtube-component/v4.2.0/dist/aframe-youtube-component.min.js"></script>
+    <script src="https://www.youtube.com/iframe_api"></script>
 </head>
 
 <body style="margin: 0; overflow: hidden;">
@@ -14,7 +15,6 @@
         id="scene"
         embedded
         gesture-detector
-        youtube
     >
         <a-marker
             type="pattern"
@@ -30,33 +30,79 @@
             cursor="fuse: false; rayOrigin: mouse;"
             id="markerA"
         >
-            <a-video
-                scale="1 1 1"
-                position="0 0.1 0"
-                rotation="-90 0 0"
-                class="clickable"
-                gesture-handler
-                youtube="src: https://www.youtube.com/watch?v=O3CCnhqLDfQ"
-            ></a-video>
+            <!-- Container for video iframe -->
+            <div id="videoContainer" class="clickable"></div>
         </a-marker>
 
         <a-entity camera></a-entity>
     </a-scene>
 
     <script>
+        var player;
+
+        function onYouTubeIframeAPIReady() {
+            player = new YT.Player('videoContainer', {
+                height: '360',
+                width: '640',
+                videoId: '', // Placeholder for YouTube video ID
+                events: {
+                    'onReady': onPlayerReady,
+                    'onStateChange': onPlayerStateChange
+                }
+            });
+        }
+
+        function onPlayerReady(event) {
+            // Video is ready to play
+        }
+
+        function onPlayerStateChange(event) {
+            // Handle player state changes (e.g., play, pause, etc.)
+        }
+
         AFRAME.registerComponent('videohandler', {
             init: function () {
                 var marker = this.el;
+                var container = document.getElementById('videoContainer');
 
                 marker.addEventListener('markerFound', function () {
-                    var vid = this.querySelector("a-video");
-                    vid.components.youtube.playVideo();
+                    var videoSource = prompt("Enter video URL:");
+                    var videoType = '';
+
+                    if (videoSource.includes('youtube.com') || videoSource.includes('youtu.be')) {
+                        videoType = 'youtube';
+                        var videoId = getYouTubeVideoId(videoSource);
+                        if (videoId) {
+                            player.loadVideoById(videoId);
+                        } else {
+                            alert('Invalid YouTube URL or ID.');
+                        }
+                    } else if (videoSource.includes('.mp4')) {
+                        videoType = 'local';
+                        container.innerHTML = `<video src="${videoSource}" autoplay loop></video>`;
+                    } else {
+                        videoType = 'external';
+                        container.innerHTML = `<iframe src="${videoSource}" frameborder="0" allowfullscreen></iframe>`;
+                    }
                 });
 
                 marker.addEventListener('markerLost', function () {
-                    var vid = this.querySelector("a-video");
-                    vid.components.youtube.pauseVideo();
+                    container.innerHTML = ''; // Clear the video container
+                    if (player && player.stopVideo) {
+                        player.stopVideo();
+                    }
                 });
+
+                function getYouTubeVideoId(url) {
+                    var videoId = '';
+                    if (url.includes('youtube.com') && url.includes('v=')) {
+                        var params = new URLSearchParams(new URL(url).search);
+                        videoId = params.get('v');
+                    } else if (url.includes('youtu.be/')) {
+                        videoId = url.split('youtu.be/')[1];
+                    }
+                    return videoId;
+                }
             },
         });
     </script>
