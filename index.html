@@ -32,7 +32,8 @@
             id="markerA"
         >
             <!-- Container for video iframe -->
-            <div id="videoContainer" class="clickable"></div>
+            <iframe src="https://www.youtube.com/watch?v=boNTSR1rCz8"/>
+<!--             <div id="videoContainer" class="clickable"></div> -->
         </a-marker>
 
         <a-entity camera></a-entity>
@@ -43,8 +44,6 @@
 
         function onYouTubeIframeAPIReady() {
             player = new YT.Player('videoContainer', {
-                height: '360',
-                width: '640',
                 videoId: 'Vb7W6yMOZaw', // Placeholder for YouTube video ID
                 events: {
                     'onReady': onPlayerReady,
